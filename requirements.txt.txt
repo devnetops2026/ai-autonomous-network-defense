@@ -1,1 +1,5 @@
-1
+1scikit-learn
+pandas
+numpy
+matplotlib
+paramiko

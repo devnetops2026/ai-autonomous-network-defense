@@ -1,36 +1,16 @@
-# \# AI Autonomous Network Defense
+# AI Autonomous Network Defense
 
-# 
+Hackathon Project – CloudHackrzz
 
-# AI-driven system that detects abnormal network behavior and automatically applies defensive actions in a simulated cloud infrastructure.
+## Features
+- Network simulation using Mininet
+- AI-based anomaly detection
+- Automated firewall response
+- DevOps pipeline for integration
 
-# 
-
-# \## Tech Stack
-
-# \- Python
-
-# \- Mininet
-
-# \- Machine Learning
-
-# \- Linux (Ubuntu)
-
-# \- SSH Automation
-
-# \- GitHub Actions
-
-# 
-
-# \## Features
-
-# \- AI-based network anomaly detection
-
-# \- Automated firewall updates
-
-# \- Suspicious node isolation
-
-# \- Real-time attack response
-
-# \- Simulated cloud network using Mininet
-
+## Tech Stack
+- Python
+- Mininet
+- Machine Learning
+- Linux Networking
+- GitHub CI/CD
