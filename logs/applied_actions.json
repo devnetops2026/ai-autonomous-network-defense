@@ -1,0 +1,8 @@
+[
+  "10.0.0.1:isolate_host",
+  "10.0.0.2:isolate_host",
+  "10.0.0.4:isolate_host",
+  "10.0.0.3:isolate_host",
+  "10.0.0.5:isolate_host",
+  "close_port:22"
+]
