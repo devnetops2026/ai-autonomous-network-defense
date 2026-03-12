@@ -9,6 +9,7 @@ INPUT_DIR = BASE_DIR / "outputs" / "agentic_json"
 LOG_FILE = BASE_DIR / "logs" / "mitigation.log"
 PROCESSED_FILE = BASE_DIR / "logs" / "processed_files.json"
 APPLIED_FILE = BASE_DIR / "logs" / "applied_actions.json"
+INCIDENT_DIR = BASE_DIR / "incidents" / "compromised_hosts"
 
 SWITCHES = ["s1", "s2"]
 
@@ -32,6 +33,31 @@ def save_json_file(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
+
+def save_compromised_host_record(item):
+    INCIDENT_DIR.mkdir(parents=True, exist_ok=True)
+
+    source_ip = item.get("source_ip", "unknown_ip")
+    timestamp = item.get("timestamp", datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    safe_timestamp = str(timestamp).replace(" ", "_").replace(":", "-")
+
+    incident_file = INCIDENT_DIR / f"{safe_timestamp}_{source_ip}.json"
+
+    record = {
+        "timestamp": item.get("timestamp"),
+        "source_ip": source_ip,
+        "threat_type": item.get("threat_type"),
+        "severity": item.get("severity"),
+        "recommended_action": "isolate_host",
+        "status": "quarantined",
+        "evidence": item.get("evidence", []),
+        "supporting_metrics": item.get("supporting_metrics", {})
+    }
+
+    with open(incident_file, "w") as f:
+        json.dump(record, f, indent=2)
+
+    print(f"[INCIDENT] saved compromised host record -> {incident_file}")
 
 def log_action(src_ip, action, reason, source_file):
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -204,6 +230,7 @@ def process_new_files():
         if data is None:
             print(f"[SKIP] Could not parse {file_path.name}")
             processed_files.append(file_path.name)
+
             continue
 
         entries = normalize_entries(data)
@@ -223,6 +250,12 @@ def process_new_files():
                 applied_actions=applied_actions,
                 item=item
             )
+        # save compromised host incident
+        if isinstance(data, dict) and "detections" in data:
+            for item in data["detections"]:
+                threat = str(item.get("threat_type", "")).lower()
+                if "compromised" in threat and "host" in threat:
+                    save_compromised_host_record(item)
 
         processed_files.append(file_path.name)
 

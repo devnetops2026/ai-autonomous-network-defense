@@ -13,7 +13,7 @@
         "10.0.0.4",
         "10.0.0.5"
       ],
-      "severity": "high",
+      "severity": "critical",
       "recommended_fix": [
         "iptables -A OUTPUT -s 10.0.0.3 -j DROP",
         "arp -a | findstr 10.0.0.3",
