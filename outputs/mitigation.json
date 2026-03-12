@@ -1,0 +1,79 @@
+[
+    {
+        "timestamp": "2026-03-12 10:20:13",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.4",
+        "dst_port": 80,
+        "packet_count": 500,
+        "reasons": [
+            "high_packet_count",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:14",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.5",
+        "dst_port": 443,
+        "packet_count": 480,
+        "reasons": [
+            "high_packet_count",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:16",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.6",
+        "dst_port": 22,
+        "packet_count": 450,
+        "reasons": [
+            "high_packet_count",
+            "suspicious_destination_port",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:17",
+        "src_ip": "10.0.0.7",
+        "dst_ip": "10.0.0.8",
+        "dst_port": 23,
+        "packet_count": 50,
+        "reasons": [
+            "suspicious_destination_port"
+        ],
+        "recommended_action": "alert_only",
+        "action_reason": "access_to_sensitive_port"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:18",
+        "src_ip": "10.0.0.8",
+        "dst_ip": "10.0.0.9",
+        "dst_port": 3389,
+        "packet_count": 60,
+        "reasons": [
+            "suspicious_destination_port"
+        ],
+        "recommended_action": "alert_only",
+        "action_reason": "access_to_sensitive_port"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:19",
+        "src_ip": "10.0.0.4",
+        "dst_ip": "10.0.0.5",
+        "dst_port": 80,
+        "packet_count": 350,
+        "reasons": [
+            "high_packet_count",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "block_src_ip",
+        "action_reason": "suspected_syn_flood"
+    }
+]

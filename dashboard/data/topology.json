@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    {"id": "h1", "role": "host", "x": 0, "y": 0},
+    {"id": "h2", "role": "host", "x": 4, "y": 0},
+    {"id": "h3", "role": "host", "x": 2, "y": -2},
+    {"id": "s1", "role": "switch", "x": 2, "y": 1.5}
+  ],
+  "links": [
+    {"source": "h1", "target": "s1"},
+    {"source": "h2", "target": "s1"},
+    {"source": "h3", "target": "s1"}
+  ]
+}
+
