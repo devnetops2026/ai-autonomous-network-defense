@@ -1,0 +1,142 @@
+{
+  "batch_name": "ddos_log",
+  "created_at": "2026-03-12 20:25:10",
+  "detections": [
+    {
+      "timestamp": "2026-03-12 12:49:52",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.1",
+        "10.0.0.4"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.1 -j DROP",
+        "ufw deny from 10.0.0.1",
+        "tcpdump -nn host 10.0.0.1 -c 50"
+      ],
+      "source_ip": "10.0.0.1",
+      "anomaly_score": 0.4382,
+      "evidence": [
+        "traffic volume reached 4968 packets at 961.8 packets/sec"
+      ],
+      "supporting_metrics": {
+        "flow_count": 4968,
+        "unique_dst_ips": 1,
+        "unique_dst_ports": 1,
+        "total_packets": 4968,
+        "packets_per_second": 961.81,
+        "syn_ratio": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-03-12 12:50:13",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.2",
+        "10.0.0.4"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.2 -j DROP",
+        "ufw deny from 10.0.0.2",
+        "tcpdump -nn host 10.0.0.2 -c 50"
+      ],
+      "source_ip": "10.0.0.2",
+      "anomaly_score": 0.5876,
+      "evidence": [
+        "traffic volume reached 4968 packets at 988.8 packets/sec"
+      ],
+      "supporting_metrics": {
+        "flow_count": 4968,
+        "unique_dst_ips": 1,
+        "unique_dst_ports": 1,
+        "total_packets": 4968,
+        "packets_per_second": 988.8,
+        "syn_ratio": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-03-12 12:50:30",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.3",
+        "10.0.0.5"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.3 -j DROP",
+        "ufw deny from 10.0.0.3",
+        "tcpdump -nn host 10.0.0.3 -c 50"
+      ],
+      "source_ip": "10.0.0.3",
+      "anomaly_score": 0.4808,
+      "evidence": [
+        "traffic volume reached 4968 packets at 961.3 packets/sec"
+      ],
+      "supporting_metrics": {
+        "flow_count": 4968,
+        "unique_dst_ips": 1,
+        "unique_dst_ports": 1,
+        "total_packets": 4968,
+        "packets_per_second": 961.29,
+        "syn_ratio": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-03-12 12:50:13",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.1",
+        "10.0.0.2",
+        "10.0.0.4"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.4 -j DROP",
+        "ufw deny from 10.0.0.4",
+        "tcpdump -nn host 10.0.0.4 -c 50"
+      ],
+      "source_ip": "10.0.0.4",
+      "anomaly_score": 0.6782,
+      "evidence": [
+        "traffic volume reached 9936 packets at 372.6 packets/sec"
+      ],
+      "supporting_metrics": {
+        "flow_count": 9936,
+        "unique_dst_ips": 2,
+        "unique_dst_ports": 1,
+        "total_packets": 9936,
+        "packets_per_second": 372.62,
+        "syn_ratio": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-03-12 12:50:30",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.3",
+        "10.0.0.5"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.5 -j DROP",
+        "ufw deny from 10.0.0.5",
+        "tcpdump -nn host 10.0.0.5 -c 50"
+      ],
+      "source_ip": "10.0.0.5",
+      "anomaly_score": 0.4509,
+      "evidence": [
+        "traffic volume reached 4968 packets at 962.0 packets/sec"
+      ],
+      "supporting_metrics": {
+        "flow_count": 4968,
+        "unique_dst_ips": 1,
+        "unique_dst_ports": 1,
+        "total_packets": 4968,
+        "packets_per_second": 962.02,
+        "syn_ratio": 0.0
+      }
+    }
+  ]
+}

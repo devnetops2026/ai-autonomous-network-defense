@@ -1,0 +1,36 @@
+{
+  "batch_name": "compromised_log",
+  "created_at": "2026-03-12 20:01:40",
+  "detections": [
+    {
+      "timestamp": "2026-03-12 13:14:50",
+      "threat_type": "Compromised Host",
+      "affected_hosts": [
+        "10.0.0.1",
+        "10.0.0.2",
+        "10.0.0.3",
+        "10.0.0.4",
+        "10.0.0.5"
+      ],
+      "severity": "high",
+      "recommended_fix": [
+        "iptables -A OUTPUT -s 10.0.0.3 -j DROP",
+        "arp -a | findstr 10.0.0.3",
+        "ping -n 1 10.0.0.4"
+      ],
+      "source_ip": "10.0.0.3",
+      "anomaly_score": 0.6667,
+      "evidence": [
+        "internal host contacted 4 peers in an abnormal pattern"
+      ],
+      "supporting_metrics": {
+        "flow_count": 206,
+        "unique_dst_ips": 4,
+        "unique_dst_ports": 1,
+        "total_packets": 206,
+        "packets_per_second": 3.93,
+        "syn_ratio": 0.0
+      }
+    }
+  ]
+}

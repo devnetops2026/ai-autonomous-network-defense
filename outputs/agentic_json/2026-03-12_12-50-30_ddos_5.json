@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-03-12 12:50:30",
+  "threat_type": "DDoS",
+  "affected_hosts": [
+    "10.0.0.3",
+    "10.0.0.5"
+  ],
+  "severity": "critical",
+  "recommended_fix": [
+    "iptables -A INPUT -s 10.0.0.5 -j DROP",
+    "ufw deny from 10.0.0.5",
+    "tcpdump -nn host 10.0.0.5 -c 50"
+  ],
+  "source_ip": "10.0.0.5",
+  "anomaly_score": 0.4509,
+  "evidence": [
+    "traffic volume reached 4968 packets at 962.0 packets/sec"
+  ],
+  "supporting_metrics": {
+    "flow_count": 4968,
+    "unique_dst_ips": 1,
+    "unique_dst_ports": 1,
+    "total_packets": 4968,
+    "packets_per_second": 962.02,
+    "syn_ratio": 0.0
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "batch_name": "traffic_log",
+  "created_at": "2026-03-12 20:15:13",
+  "detections": [
+    {
+      "timestamp": "2026-03-12 10:20:16",
+      "threat_type": "DDoS",
+      "affected_hosts": [
+        "10.0.0.4",
+        "10.0.0.5",
+        "10.0.0.6",
+        "10.0.0.9"
+      ],
+      "severity": "critical",
+      "recommended_fix": [
+        "iptables -A INPUT -s 10.0.0.9 -j DROP",
+        "ufw deny from 10.0.0.9",
+        "tcpdump -nn host 10.0.0.9 -c 50"
+      ],
+      "source_ip": "10.0.0.9",
+      "anomaly_score": 0.7203,
+      "evidence": [
+        "traffic volume reached 1430 packets at 476.7 packets/sec",
+        "high SYN ratio suggests flooding behavior"
+      ],
+      "supporting_metrics": {
+        "flow_count": 3,
+        "unique_dst_ips": 3,
+        "unique_dst_ports": 3,
+        "total_packets": 1430,
+        "packets_per_second": 476.67,
+        "syn_ratio": 1.0
+      }
+    }
+  ]
+}
