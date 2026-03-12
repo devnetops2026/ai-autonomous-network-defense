@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Autonomous Network Defense Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+<header class="header">
+    <div class="header-title">
+        <h1>AI Autonomous Network Defense</h1>
+        <p>Unified view for Network, AI/ML, and DevOps engineers</p>
+    </div>
+    <div class="header-badges">
+        <span class="badge badge-network">Network</span>
+        <span class="badge badge-aiml">AI/ML</span>
+        <span class="badge badge-devops">DevOps</span>
+    </div>
+</header>
+
+<main class="layout">
+    <section class="panel panel-wide">
+        <h2>Network View</h2>
+        <div class="panel-body">
+            <div id="topology-graph" class="chart"></div>
+        </div>
+        <p class="panel-footnote">Topology from <code>topology.json</code></p>
+    </section>
+
+    <section class="panel">
+        <h2>Traffic Statistics</h2>
+        <div class="panel-body">
+            <div id="traffic-timeseries" class="chart"></div>
+            <div class="chart-row">
+                <div id="protocol-distribution" class="chart chart-small"></div>
+                <div id="port-usage" class="chart chart-small"></div>
+            </div>
+        </div>
+        <p class="panel-footnote">Network logs from <code>traffic_logs.csv</code></p>
+    </section>
+
+    <section class="panel">
+        <h2>Top Talkers</h2>
+        <div class="panel-body">
+            <div id="top-talkers" class="chart"></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Security Alerts</h2>
+        <div class="panel-body">
+            <table class="table" id="alerts-table">
+                <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>IP</th>
+                    <th>Attack</th>
+                    <th>Severity</th>
+                    <th>Anomaly Score</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <p class="panel-footnote">AI detection from <code>alerts.csv</code></p>
+    </section>
+
+    <section class="panel panel-actions">
+        <h2>Defense Actions</h2>
+        <div class="panel-body">
+            <div class="actions-row">
+                <div>
+                    <label for="ip-input">Suspicious IP</label>
+                    <input id="ip-input" type="text" placeholder="e.g. 10.0.0.9">
+                    <button id="btn-block-ip" class="btn btn-danger">Block IP</button>
+                </div>
+                <div>
+                    <label for="host-input">Host</label>
+                    <input id="host-input" type="text" placeholder="e.g. h3">
+                    <button id="btn-isolate-host" class="btn btn-warning">Isolate Host</button>
+                </div>
+                <div class="reset-column">
+                    <span>Network Control</span>
+                    <button id="btn-reset-network" class="btn btn-secondary">Reset Network</button>
+                </div>
+            </div>
+            <div id="action-status" class="action-status"></div>
+        </div>
+        <p class="panel-footnote">Dashboard → API → DevOps script → Ryu flow rule</p>
+    </section>
+</main>
+
+<footer class="footer">
+    <span>Auto-refresh every 5 seconds • Designed for live demo</span>
+</footer>
+
+<script>
+    const REFRESH_INTERVAL_MS = 5000;
+
+    async function fetchJson(url, options = {}) {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`Request failed: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    function renderTraffic(traffic) {
+        const times = traffic.timeseries.timestamp;
+        const packets = traffic.timeseries.packets;
+        const bytes = traffic.timeseries.bytes;
+
+        const packetsTrace = {
+            x: times,
+            y: packets,
+            name: "Packets/sec",
+            type: "scatter",
+            mode: "lines+markers",
+            line: {color: "#007bff"}
+        };
+
+        const bytesTrace = {
+            x: times,
+            y: bytes,
+            name: "Bytes/sec",
+            type: "scatter",
+            mode: "lines+markers",
+            yaxis: "y2",
+            line: {color: "#28a745"}
+        };
+
+        const layout = {
+            margin: {t: 30, r: 40, b: 40, l: 50},
+            xaxis: {title: "Time"},
+            yaxis: {title: "Packets/sec"},
+            yaxis2: {
+                title: "Bytes/sec",
+                overlaying: "y",
+                side: "right"
+            },
+            legend: {orientation: "h"}
+        };
+
+        Plotly.react("traffic-timeseries", [packetsTrace, bytesTrace], layout, {responsive: true});
+
+        const protocolTrace = {
+            labels: traffic.protocol_distribution.protocols,
+            values: traffic.protocol_distribution.counts,
+            type: "pie",
+            hole: 0.4
+        };
+
+        Plotly.react("protocol-distribution", [protocolTrace], {
+            margin: {t: 30, b: 20, l: 20, r: 20},
+            showlegend: true
+        }, {responsive: true});
+
+        const portTrace = {
+            x: traffic.port_usage.ports,
+            y: traffic.port_usage.packets,
+            type: "bar",
+            marker: {color: "#6f42c1"}
+        };
+
+        Plotly.react("port-usage", [portTrace], {
+            margin: {t: 30, b: 60, l: 50, r: 10},
+            xaxis: {title: "Destination Port"},
+            yaxis: {title: "Packets"},
+        }, {responsive: true});
+
+        const topTalkersTrace = {
+            x: traffic.top_talkers.ips,
+            y: traffic.top_talkers.packets,
+            type: "bar",
+            marker: {color: "#17a2b8"}
+        };
+
+        Plotly.react("top-talkers", [topTalkersTrace], {
+            margin: {t: 30, b: 80, l: 60, r: 10},
+            xaxis: {title: "Source IP"},
+            yaxis: {title: "Packets"},
+        }, {responsive: true});
+    }
+
+    function renderAlerts(alerts) {
+        const tbody = document.querySelector("#alerts-table tbody");
+        tbody.innerHTML = "";
+
+        alerts.forEach(alert => {
+            const tr = document.createElement("tr");
+            tr.classList.add(`severity-${alert.severity.toLowerCase()}`);
+
+            tr.innerHTML = `
+                <td>${alert.timestamp}</td>
+                <td>${alert.ip}</td>
+                <td>${alert.attack_type}</td>
+                <td>${alert.severity}</td>
+                <td>${alert.anomaly_score.toFixed(2)}</td>
+                <td><button class="btn btn-mini btn-danger" data-ip="${alert.ip}">Block</button></td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll("button[data-ip]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const ip = btn.getAttribute("data-ip");
+                document.getElementById("ip-input").value = ip;
+                triggerBlockIp(ip);
+            });
+        });
+    }
+
+    function renderTopology(topo) {
+        const nodes = topo.nodes || [];
+        const links = topo.links || [];
+
+        if (!nodes.length) {
+            Plotly.react("topology-graph", [], {title: "No topology loaded"}, {responsive: true});
+            return;
+        }
+
+        const x = nodes.map(n => n.x);
+        const y = nodes.map(n => n.y);
+        const text = nodes.map(n => n.id + " (" + n.role + ")");
+        const color = nodes.map(n => n.role === "switch" ? "#ff7f0e" : "#1f77b4");
+        const size = nodes.map(n => n.role === "switch" ? 20 : 14);
+
+        const edgeX = [];
+        const edgeY = [];
+
+        links.forEach(link => {
+            const src = nodes.find(n => n.id === link.source);
+            const dst = nodes.find(n => n.id === link.target);
+            if (!src || !dst) return;
+            edgeX.push(src.x, dst.x, null);
+            edgeY.push(src.y, dst.y, null);
+        });
+
+        const edgeTrace = {
+            x: edgeX,
+            y: edgeY,
+            mode: "lines",
+            line: {width: 2, color: "#cccccc"},
+            hoverinfo: "none",
+            showlegend: false
+        };
+
+        const nodeTrace = {
+            x,
+            y,
+            mode: "markers+text",
+            type: "scatter",
+            text: nodes.map(n => n.id),
+            textposition: "bottom center",
+            marker: {
+                size,
+                color,
+                line: {width: 1, color: "#ffffff"}
+            },
+            hoverinfo: "text",
+            hovertext: text,
+            showlegend: false
+        };
+
+        const layout = {
+            margin: {t: 20, r: 20, b: 20, l: 20},
+            xaxis: {showgrid: false, zeroline: false, visible: false},
+            yaxis: {showgrid: false, zeroline: false, visible: false},
+            dragmode: false
+        };
+
+        Plotly.react("topology-graph", [edgeTrace, nodeTrace], layout, {responsive: true});
+    }
+
+    function setStatus(message, type = "info") {
+        const el = document.getElementById("action-status");
+        el.textContent = message;
+        el.className = `action-status action-${type}`;
+    }
+
+    async function triggerBlockIp(ip) {
+        try {
+            setStatus(`Sending block command for ${ip}…`, "info");
+            const result = await fetchJson("/api/block_ip", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ip})
+            });
+            if (result.status === "ok") {
+                setStatus(`Blocked ${ip}: ${result.detail}`, "success");
+            } else {
+                setStatus(`Failed to block ${ip}: ${result.detail}`, "error");
+            }
+        } catch (err) {
+            setStatus(`Error blocking ${ip}: ${err.message}`, "error");
+        }
+    }
+
+    async function triggerIsolateHost(host) {
+        try {
+            setStatus(`Sending isolate command for ${host}…`, "info");
+            const result = await fetchJson("/api/isolate_host", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({host})
+            });
+            if (result.status === "ok") {
+                setStatus(`Isolate ${host}: ${result.detail}`, "success");
+            } else {
+                setStatus(`Failed to isolate ${host}: ${result.detail}`, "error");
+            }
+        } catch (err) {
+            setStatus(`Error isolating host: ${err.message}`, "error");
+        }
+    }
+
+    async function triggerResetNetwork() {
+        try {
+            setStatus("Sending network reset…", "info");
+            const result = await fetchJson("/api/reset_network", {
+                method: "POST"
+            });
+            if (result.status === "ok") {
+                setStatus(`Network reset: ${result.detail}`, "success");
+            } else {
+                setStatus(`Failed to reset network: ${result.detail}`, "error");
+            }
+        } catch (err) {
+            setStatus(`Error resetting network: ${err.message}`, "error");
+        }
+    }
+
+    async function refreshData() {
+        try {
+            const [traffic, alerts, topo] = await Promise.all([
+                fetchJson("/api/traffic"),
+                fetchJson("/api/alerts"),
+                fetchJson("/api/topology"),
+            ]);
+            renderTraffic(traffic);
+            renderAlerts(alerts.alerts);
+            renderTopology(topo);
+        } catch (err) {
+            console.error(err);
+            setStatus(`Error refreshing data: ${err.message}`, "error");
+        }
+    }
+
+    function initControls() {
+        document.getElementById("btn-block-ip").addEventListener("click", () => {
+            const ip = document.getElementById("ip-input").value.trim();
+            if (!ip) {
+                setStatus("Please enter an IP to block.", "error");
+                return;
+            }
+            triggerBlockIp(ip);
+        });
+
+        document.getElementById("btn-isolate-host").addEventListener("click", () => {
+            const host = document.getElementById("host-input").value.trim();
+            if (!host) {
+                setStatus("Please enter a host to isolate.", "error");
+                return;
+            }
+            triggerIsolateHost(host);
+        });
+
+        document.getElementById("btn-reset-network").addEventListener("click", () => {
+            triggerResetNetwork();
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initControls();
+        refreshData();
+        setInterval(refreshData, REFRESH_INTERVAL_MS);
+    });
+</script>
+</body>
+</html>
+
