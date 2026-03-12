@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from ipaddress import ip_address
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -35,7 +35,7 @@ class MonitorConfig:
     logs_dir: Path = Path("data/incoming_logs")
     output_dir: Path = Path("outputs/agentic_json")
     poll_seconds: int = 20
-    duration_seconds: int = 120
+    duration_seconds: Optional[int] = None
     contamination: float = 0.12
     min_group_rows: int = 3
 
@@ -304,27 +304,17 @@ def safe_slug(text: str) -> str:
 
 def write_detection_outputs(detections: List[Dict[str, object]], output_dir: Path, batch_name: str) -> List[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    written_files: List[Path] = []
-
-    for index, detection in enumerate(detections, start=1):
-        timestamp = detection["timestamp"].replace(":", "-").replace(" ", "_")
-        filename = f"{timestamp}_{safe_slug(detection['threat_type'])}_{index}.json"
-        file_path = output_dir / filename
-        with open(file_path, "w", encoding="utf-8") as handle:
-            json.dump(detection, handle, indent=2)
-        written_files.append(file_path)
 
     summary_path = output_dir / f"{batch_name}_summary.json"
     summary_payload = {
         "batch_name": batch_name,
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "detection_count": len(detections),
         "detections": detections,
     }
     with open(summary_path, "w", encoding="utf-8") as handle:
         json.dump(summary_payload, handle, indent=2)
-    written_files.append(summary_path)
-
-    return written_files
+    return [summary_path]
 
 
 def process_log_file(file_path: Path, config: MonitorConfig) -> List[Path]:
@@ -352,9 +342,16 @@ def monitor_folder(config: MonitorConfig) -> None:
     config.output_dir.mkdir(parents=True, exist_ok=True)
 
     processed_files = set()
-    deadline = datetime.now() + timedelta(seconds=config.duration_seconds)
+    deadline = (
+        datetime.now() + timedelta(seconds=config.duration_seconds)
+        if config.duration_seconds is not None and config.duration_seconds > 0
+        else None
+    )
 
-    print(f"Monitoring {config.logs_dir} every {config.poll_seconds}s until {deadline.strftime('%Y-%m-%d %H:%M:%S')}")
+    if deadline is None:
+        print(f"Monitoring {config.logs_dir} every {config.poll_seconds}s until you stop the script")
+    else:
+        print(f"Monitoring {config.logs_dir} every {config.poll_seconds}s until {deadline.strftime('%Y-%m-%d %H:%M:%S')}")
 
     while True:
         csv_files = sorted(config.logs_dir.glob("*.csv"))
@@ -368,7 +365,7 @@ def monitor_folder(config: MonitorConfig) -> None:
             finally:
                 processed_files.add(file_path)
 
-        if datetime.now() >= deadline:
+        if deadline is not None and datetime.now() >= deadline:
             break
 
         time.sleep(config.poll_seconds)
@@ -381,7 +378,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--logs-dir", default="data/incoming_logs", help="Folder containing incoming CSV logs.")
     parser.add_argument("--output-dir", default="outputs/agentic_json", help="Folder for JSON remediation files.")
     parser.add_argument("--poll-seconds", type=int, default=20, help="How often to scan for new CSVs.")
-    parser.add_argument("--duration-seconds", type=int, default=120, help="How long to monitor the folder.")
+    parser.add_argument(
+        "--duration-seconds",
+        type=int,
+        default=0,
+        help="How long to monitor the folder. Use 0 to run until you manually stop it.",
+    )
     parser.add_argument("--contamination", type=float, default=0.12, help="Isolation Forest anomaly rate.")
     parser.add_argument(
         "--single-file",
@@ -399,7 +401,7 @@ def main() -> None:
         logs_dir=Path(args.logs_dir),
         output_dir=Path(args.output_dir),
         poll_seconds=args.poll_seconds,
-        duration_seconds=args.duration_seconds,
+        duration_seconds=args.duration_seconds if args.duration_seconds > 0 else None,
         contamination=args.contamination,
     )
 
