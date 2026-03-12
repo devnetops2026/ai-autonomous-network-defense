@@ -9,7 +9,8 @@
             "high_packet_count",
             "possible_syn_flood"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
     },
     {
         "timestamp": "2026-03-12 10:20:14",
@@ -21,7 +22,8 @@
             "high_packet_count",
             "possible_syn_flood"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
     },
     {
         "timestamp": "2026-03-12 10:20:16",
@@ -34,7 +36,8 @@
             "suspicious_destination_port",
             "possible_syn_flood"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "isolate_host",
+        "action_reason": "critical_syn_flood_behavior"
     },
     {
         "timestamp": "2026-03-12 10:20:17",
@@ -45,7 +48,8 @@
         "reasons": [
             "suspicious_destination_port"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "alert_only",
+        "action_reason": "access_to_sensitive_port"
     },
     {
         "timestamp": "2026-03-12 10:20:18",
@@ -56,7 +60,8 @@
         "reasons": [
             "suspicious_destination_port"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "alert_only",
+        "action_reason": "access_to_sensitive_port"
     },
     {
         "timestamp": "2026-03-12 10:20:19",
@@ -68,6 +73,7 @@
             "high_packet_count",
             "possible_syn_flood"
         ],
-        "recommended_action": "block_src_ip"
+        "recommended_action": "block_src_ip",
+        "action_reason": "suspected_syn_flood"
     }
 ]

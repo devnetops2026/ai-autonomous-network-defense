@@ -1,20 +1,15 @@
-import json
-
 from network_simulation.topology import start_network
-from defense_automation.auto_block import block_ip
+from defense_automation.mitigation_engine import apply_mitigations
+import subprocess
 
 
 def monitor_traffic():
     print("Monitoring network traffic...")
 
 
-def read_mitigations():
-    try:
-        with open("outputs/mitigation.json") as f:
-            alerts = json.load(f)
-        return alerts
-    except FileNotFoundError:
-        return []
+def run_ai_detection():
+    print("Running AI detection...")
+    subprocess.run(["python", "ai_engine/detect.py"], check=True)
 
 
 def main():
@@ -23,16 +18,11 @@ def main():
     start_network()
     monitor_traffic()
 
-    alerts = read_mitigations()
+    print("Running AI detection on network traffic logs...")
 
-    if not alerts:
-        print("No threats detected")
-        return
+    run_ai_detection()
 
-    for alert in alerts:
-        attacker_ip = alert["src_ip"]
-        print(f"Threat detected from {attacker_ip}")
-        block_ip(attacker_ip)
+    apply_mitigations()
 
 
 if __name__ == "__main__":
