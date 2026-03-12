@@ -1,0 +1,39 @@
+[
+    {
+        "timestamp": "2026-03-12 10:20:13",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.4",
+        "dst_port": 80,
+        "packet_count": 500,
+        "reasons": [
+            "high_packet_count",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "block_src_ip"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:14",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.5",
+        "dst_port": 443,
+        "packet_count": 480,
+        "reasons": [
+            "high_packet_count",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "block_src_ip"
+    },
+    {
+        "timestamp": "2026-03-12 10:20:16",
+        "src_ip": "10.0.0.9",
+        "dst_ip": "10.0.0.6",
+        "dst_port": 22,
+        "packet_count": 450,
+        "reasons": [
+            "high_packet_count",
+            "suspicious_destination_port",
+            "possible_syn_flood"
+        ],
+        "recommended_action": "block_src_ip"
+    }
+]
