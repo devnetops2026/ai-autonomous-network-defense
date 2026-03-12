@@ -1,4 +1,4 @@
-print()from network_simulation.topology import start_network
+from network_simulation.topology import start_network
 from ai_detection.anomaly_detector import detect_anomaly
 from automation.auto_block import block_attacker
 
@@ -12,6 +12,6 @@ def main():
     if anomaly:
         print("Threat detected!")
         block_attacker()
-    
+
 if __name__ == "__main__":
     main()
